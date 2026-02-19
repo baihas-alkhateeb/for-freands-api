@@ -1,0 +1,28 @@
+# Credentials
+**/*.json
+!**/appsettings.json
+!**/appsettings.Development.json
+!**/package.json
+!**/tsconfig.json
+!**/*.schema.json
+
+# Build results
+**/bin/
+**/obj/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# VS Code
+.vscode/
+
+# Legacy
+project.lock.json
+
+# Docker
+.dockerignore
+
+RENDER_ENV_VAR.txt
