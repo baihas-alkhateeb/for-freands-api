@@ -10,7 +10,31 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddCors(options =>
 {
-	var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>() ?? new [] { "http://localhost:3000" };
+	// 1. Try to get as string (Environment Variable friendly: "https://a.com,https://b.com")
+	var allowedOriginsStr = builder.Configuration["AllowedOrigins"];
+	var originList = new List<string>();
+
+	if (!string.IsNullOrEmpty(allowedOriginsStr))
+	{
+		originList.AddRange(allowedOriginsStr.Split(',', StringSplitOptions.RemoveEmptyEntries)
+										  .Select(o => o.Trim()));
+	}
+	else
+	{
+		// 2. Fallback to appsettings.json array
+		var appSettingsOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
+		if (appSettingsOrigins != null)
+		{
+			originList.AddRange(appSettingsOrigins);
+		}
+	}
+
+	// 3. Always allow localhost for React development
+	originList.Add("http://localhost:3000");
+	originList.Add("http://localhost:5173");
+
+	var allowedOrigins = originList.Distinct().ToArray();
+
 	options.AddPolicy("AllowLocalhost",
 		policy => policy.WithOrigins(allowedOrigins)
 						  .AllowAnyMethod()
